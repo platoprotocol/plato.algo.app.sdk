@@ -1,0 +1,8 @@
+{
+    "name": "algo-demo",
+    "version": "1.0.0",
+    "license": "MIT",
+    "dependencies": {
+        "algosdk": "^1.13.0"
+    }
+}
