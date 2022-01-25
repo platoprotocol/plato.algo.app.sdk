@@ -1,6 +1,11 @@
 const algosdk = require("algosdk");
 const { createAlgoClient } = require("./utils");
-const { ASA_ID, APP_ID, ASA_HOLDER_MNEMONIC, EATER_MNEMONIC } = require("./consts");
+const {
+  ASA_ID,
+  APP_ID,
+  ASA_HOLDER_MNEMONIC,
+  EATER_MNEMONIC,
+} = require("./consts");
 
 (async () => {
   const algodClient = createAlgoClient();
@@ -38,9 +43,8 @@ const { ASA_ID, APP_ID, ASA_HOLDER_MNEMONIC, EATER_MNEMONIC } = require("./const
   console.log("Wait for a new block");
   await algosdk.waitForConfirmation(algodClient, txId, 4);
   console.log("A new block has been created");
-  const accountInfo = await algodClient.accountInformation(receiverAddress).do();
-  console.log(
-    `Asset amount:`,
-    accountInfo.assets.find((a) => a["asset-id"] === ASA_ID).amount
-  );
+  const accountInfo = await algodClient
+    .accountInformation(receiverAddress)
+    .do();
+  console.log(`account info`, accountInfo);
 })();

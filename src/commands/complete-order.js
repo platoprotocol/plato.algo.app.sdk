@@ -1,6 +1,11 @@
 const algosdk = require("algosdk");
 const { createAlgoClient } = require("./utils");
-const { APP_ID, EATER_MNEMONIC, COURIER_MNEMONIC } = require("./consts");
+const {
+  ASA_ID,
+  APP_ID,
+  EATER_MNEMONIC,
+  COURIER_MNEMONIC,
+} = require("./consts");
 
 (async () => {
   const algodClient = createAlgoClient();
@@ -15,12 +20,15 @@ const { APP_ID, EATER_MNEMONIC, COURIER_MNEMONIC } = require("./consts");
   // create a transaction
   const appArgs = [new Uint8Array(Buffer.from("COMPLETE_ORDER"))];
   const accounts = [receiverAccount.addr];
+  const foreignAssets = [ASA_ID];
   const txn = algosdk.makeApplicationNoOpTxn(
     senderAccount.addr,
     params,
     APP_ID,
     appArgs,
-    accounts
+    accounts,
+    undefined,
+    foreignAssets
   );
 
   const txId = txn.txID().toString();

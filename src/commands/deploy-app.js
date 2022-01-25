@@ -44,7 +44,7 @@ const sendFunds = async (client, sender, receiver, amount) => {
 (async () => {
   // get accounts from mnemonic
   const rewardAmount = 1111;
-  const escrowBalance = 200000;
+  const escrowBalance = 300000;
   const eaterAccount = algosdk.mnemonicToSecretKey(EATER_MNEMONIC);
   const courierAccount = algosdk.mnemonicToSecretKey(COURIER_MNEMONIC);
   console.log("eater address:", eaterAccount.addr);

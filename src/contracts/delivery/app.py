@@ -46,10 +46,22 @@ def handle_creation():
     )
 
 @Subroutine(TealType.none)
+def send_tip():
+    courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
+    asset_balance = AssetHolding.balance(Global.current_application_address(), AppParams.ASA_ID)
+    return Seq(
+        asset_balance,
+        inner_asset_transfer_txn(AppParams.ASA_ID, asset_balance.value(), courier_address)
+    )
+
+@Subroutine(TealType.none)
 def release_funds():
     amount = App.globalGet(GlobalState.Variables.REWARD_AMOUNT)
     courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
-    return inner_payment_txn(amount, courier_address)
+    return Seq(
+        send_tip(),
+        inner_payment_txn(amount, courier_address)
+    )
 
 @Subroutine(TealType.uint64)
 def complete_order():
