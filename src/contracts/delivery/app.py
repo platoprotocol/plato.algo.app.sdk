@@ -37,30 +37,30 @@ def can_mark_as_delivered():
 @Subroutine(TealType.uint64)
 def handle_creation():
     courier_address = Txn.application_args[AppParams.COURIER_ADDRESS_INDEX]
+    restaurant_address = Txn.application_args[AppParams.RESTAURANT_ADDRESS_INDEX]
     reward_amount = Btoi(Txn.application_args[AppParams.REWARD_AMOUNT_INDEX])
     return Seq(
         App.globalPut(GlobalState.Variables.COURIER_ADDRESS, courier_address),
+        App.globalPut(GlobalState.Variables.RESTAURANT_ADDRESS, restaurant_address),
         App.globalPut(GlobalState.Variables.REWARD_AMOUNT, reward_amount),
         App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.PENDING_DELIVERY),
         Int(1)
     )
 
 @Subroutine(TealType.none)
-def send_tip():
-    courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
-    asset_balance = AssetHolding.balance(Global.current_application_address(), AppParams.ASA_ID)
-    return Seq(
-        asset_balance,
-        inner_asset_transfer_txn(AppParams.ASA_ID, asset_balance.value(), courier_address)
-    )
+def send_tip_to(address):
+    # Transfer all available PLATO tokens to a courier and close the holding ASA to close the escrow account.
+    # https://developer.algorand.org/docs/get-details/transactions/#close-an-account
+    return inner_asset_transfer_txn(AppParams.ASA_ID, Int(0), address, address)
 
 @Subroutine(TealType.none)
 def release_funds():
     amount = App.globalGet(GlobalState.Variables.REWARD_AMOUNT)
     courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
+    restaurant_address = App.globalGet(GlobalState.Variables.RESTAURANT_ADDRESS)
     return Seq(
-        send_tip(),
-        inner_payment_txn(amount, courier_address)
+        send_tip_to(courier_address),
+        inner_payment_txn(amount, courier_address, restaurant_address)
     )
 
 @Subroutine(TealType.uint64)

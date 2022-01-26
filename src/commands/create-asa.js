@@ -6,7 +6,7 @@ const { ASA_HOLDER_MNEMONIC } = require("./consts");
   const client = createAlgoClient();
   const account = algosdk.mnemonicToSecretKey(ASA_HOLDER_MNEMONIC);
 
-  const total = 100000000; // how many of this asset there will be
+  const total = 1000000000; // how many of this asset there will be
   const decimals = 2; // units of this asset are whole-integer amounts
   const assetName = 'plto';
   const unitName = 'PLTO';

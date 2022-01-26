@@ -5,12 +5,14 @@ const {
   APP_ID,
   EATER_MNEMONIC,
   COURIER_MNEMONIC,
+  RESTAURANT_MNEMONIC,
 } = require("./consts");
 
 (async () => {
   const algodClient = createAlgoClient();
   const senderAccount = algosdk.mnemonicToSecretKey(EATER_MNEMONIC);
   const receiverAccount = algosdk.mnemonicToSecretKey(COURIER_MNEMONIC);
+  const restaurantAccount = algosdk.mnemonicToSecretKey(RESTAURANT_MNEMONIC);
   // get suggested parameters
   const params = await algodClient.getTransactionParams().do();
   // comment out the next two lines to use suggested fee
@@ -19,7 +21,7 @@ const {
 
   // create a transaction
   const appArgs = [new Uint8Array(Buffer.from("COMPLETE_ORDER"))];
-  const accounts = [receiverAccount.addr];
+  const accounts = [receiverAccount.addr, restaurantAccount.addr];
   const foreignAssets = [ASA_ID];
   const txn = algosdk.makeApplicationNoOpTxn(
     senderAccount.addr,

@@ -1,10 +1,10 @@
 const algosdk = require("algosdk");
 const { createAlgoClient } = require("./utils");
-const { ASA_ID, EATER_MNEMONIC } = require("./consts");
+const { ASA_ID, EATER_MNEMONIC, COURIER_MNEMONIC, RESTAURANT_MNEMONIC } = require("./consts");
 
 (async () => {
   const algodClient = createAlgoClient();
-  const sender = algosdk.mnemonicToSecretKey(EATER_MNEMONIC);
+  const sender = algosdk.mnemonicToSecretKey(COURIER_MNEMONIC);
   // get suggested parameters
   const suggestedParams = await algodClient.getTransactionParams().do();
   suggestedParams.fee = 1000;

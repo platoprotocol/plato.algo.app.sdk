@@ -18,27 +18,32 @@ def inner_asset_opt_in(asset_id: TealType.uint64, asset_receiver: TealType.bytes
 def inner_asset_transfer_txn(
     asset_id: TealType.uint64,
     asset_amount: TealType.uint64,
-    asset_receiver: TealType.bytes):
+    asset_receiver: TealType.bytes,
+    close_to: TealType.bytes):
     return Seq([
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
             TxnField.type_enum: TxnType.AssetTransfer,
             TxnField.xfer_asset: asset_id,
             TxnField.asset_amount: asset_amount,
-            TxnField.asset_receiver: asset_receiver
+            TxnField.asset_receiver: asset_receiver,
+            TxnField.asset_close_to: close_to
             }),
         InnerTxnBuilder.Submit()
     ])
 
 @Subroutine(TealType.none)
-def inner_payment_txn(amount: TealType.uint64, receiver: TealType.bytes) -> Expr:
+def inner_payment_txn(
+    amount: TealType.uint64,
+    receiver: TealType.bytes,
+    close_to: TealType.bytes):
     return Seq([
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
             TxnField.type_enum: TxnType.Payment,
-            TxnField.sender: Global.current_application_address(),
             TxnField.amount: amount,
-            TxnField.receiver: receiver
+            TxnField.receiver: receiver,
+            TxnField.close_remainder_to: close_to
             }),
         InnerTxnBuilder.Submit()
     ])

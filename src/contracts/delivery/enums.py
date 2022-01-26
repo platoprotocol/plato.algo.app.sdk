@@ -13,22 +13,24 @@ class OrderStatus:
     COMPLETED: TealType.uint64 = Int(3)
 
 class AppParams:
-    ASA_ID: TealType.uint64 = Int(79)
+    ASA_ID: TealType.uint64 = Int(1)
     ACCEPT_DELIVERY_WINDOW: TealType.uint64 = Int(30) # seconds
     ACTION_TYPE_PARAM_INDEX = 0
     COURIER_ADDRESS_INDEX = 0
-    REWARD_AMOUNT_INDEX = 1
+    RESTAURANT_ADDRESS_INDEX = 1
+    REWARD_AMOUNT_INDEX = 2
 
 class GlobalState:
     """ wrapper class for access to predetermined Global State properties"""
     class Schema:
         """ Global State Schema """
         NUM_UINTS: TealType.uint64 = Int(3)
-        NUM_BYTESLICES: TealType.uint64 = Int(1)
+        NUM_BYTESLICES: TealType.uint64 = Int(2)
         
     class Variables:
         """ Global State Variables """
         COURIER_ADDRESS: TealType.bytes = Bytes("courierAddr")
+        RESTAURANT_ADDRESS: TealType.bytes = Bytes("restaurantAddr")
         DELIVERED_TIMESTAMP: TealType.bytes = Bytes("deliveredTime")
         REWARD_AMOUNT: TealType.bytes = Bytes("rewardAmount")
         ORDER_STATUS: TealType.bytes = Bytes("orderStatus")

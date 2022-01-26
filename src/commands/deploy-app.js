@@ -1,6 +1,10 @@
 const algosdk = require("algosdk");
 const { createAlgoClient, compileProgram } = require("./utils");
-const { ASA_ID, COURIER_MNEMONIC, EATER_MNEMONIC } = require("./consts");
+const {
+  COURIER_MNEMONIC,
+  EATER_MNEMONIC,
+  RESTAURANT_MNEMONIC,
+} = require("./consts");
 
 const APPROVAL_PROGRAM_FILE_PATH = "./dist/escrow_approval.teal";
 const CLEAR_PROGRAM_FILE_PATH = "./dist/escrow_clear_program.teal";
@@ -43,17 +47,24 @@ const sendFunds = async (client, sender, receiver, amount) => {
 
 (async () => {
   // get accounts from mnemonic
-  const rewardAmount = 1111;
+  const rewardAmount = 10000;
   const escrowBalance = 300000;
   const eaterAccount = algosdk.mnemonicToSecretKey(EATER_MNEMONIC);
   const courierAccount = algosdk.mnemonicToSecretKey(COURIER_MNEMONIC);
+  const restaurantAccount = algosdk.mnemonicToSecretKey(RESTAURANT_MNEMONIC);
   console.log("eater address:", eaterAccount.addr);
   console.log("courier address:", courierAccount.addr);
+  console.log("restaurant address:", restaurantAccount.addr);
   const client = createAlgoClient();
 
   // Check your balance
-  const eaterAccountInfo = await client.accountInformation(eaterAccount.addr).do();
-  console.log("Eater's account balance: %d microAlgos", eaterAccountInfo.amount);
+  const eaterAccountInfo = await client
+    .accountInformation(eaterAccount.addr)
+    .do();
+  console.log(
+    "Eater's account balance: %d microAlgos",
+    eaterAccountInfo.amount
+  );
   if (escrowBalance + MIN_TXN_FEE > eaterAccountInfo.amount) {
     throw new Error("Eater has insufficient funds");
   }
@@ -68,9 +79,10 @@ const sendFunds = async (client, sender, receiver, amount) => {
   const localInts = 0;
   const localBytes = 0;
   const globalInts = 3;
-  const globalBytes = 1;
+  const globalBytes = 2;
   const appArgs = [
     algosdk.decodeAddress(courierAccount.addr).publicKey,
+    algosdk.decodeAddress(restaurantAccount.addr).publicKey,
     algosdk.encodeUint64(rewardAmount),
   ];
   // const accounts = [courierAccount.addr];
@@ -122,7 +134,10 @@ const sendFunds = async (client, sender, receiver, amount) => {
   console.log(`Fund an escrow with ${escrowBalance} microAlogs`);
   await sendFunds(client, eaterAccount, escrowAddress, escrowBalance);
   const escrowAccountInfo = await client.accountInformation(escrowAddress).do();
-  console.log("Escrow account balance: %d microAlgos", escrowAccountInfo.amount);
+  console.log(
+    "Escrow account balance: %d microAlgos",
+    escrowAccountInfo.amount
+  );
 })()
   .then(() => console.log("DONE🎉"))
   .catch(console.error);

@@ -5,12 +5,13 @@ const {
   APP_ID,
   ASA_HOLDER_MNEMONIC,
   EATER_MNEMONIC,
+  COURIER_MNEMONIC
 } = require("./consts");
 
 (async () => {
   const algodClient = createAlgoClient();
   const sender = algosdk.mnemonicToSecretKey(ASA_HOLDER_MNEMONIC);
-  // const receiverAddress = algosdk.mnemonicToSecretKey(EATER_MNEMONIC);
+  // const receiverAddress = algosdk.mnemonicToSecretKey(ASA_HOLDER_MNEMONIC).addr;
   const receiverAddress = algosdk.getApplicationAddress(APP_ID);
   // get suggested parameters
   const suggestedParams = await algodClient.getTransactionParams().do();
