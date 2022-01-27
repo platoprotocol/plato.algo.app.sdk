@@ -8,7 +8,7 @@ def can_complete_order():
     order_status = App.globalGet(GlobalState.Variables.ORDER_STATUS)
     return Seq(
         Assert(Txn.sender() == Global.creator_address()),
-        Assert(order_status == OrderStatus.DELIVERED),
+        Assert(Or(order_status == OrderStatus.DELIVERED, order_status == OrderStatus.DISPUTE)),
         Int(1)
     )
 
@@ -24,6 +24,7 @@ def can_claim_funds():
         Assert(Global.latest_timestamp() >= confirmation_dead_line),
         Int(1)
     )
+
 @Subroutine(TealType.uint64)
 def can_mark_as_delivered():
     courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
@@ -31,6 +32,22 @@ def can_mark_as_delivered():
     return Seq(
         Assert(Txn.sender() == courier_address),
         Assert(order_status == OrderStatus.PENDING_DELIVERY),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
+def can_start_disput():
+    order_status = App.globalGet(GlobalState.Variables.ORDER_STATUS)
+    return Seq(
+        Assert(Txn.sender() == Global.creator_address()),
+        Assert(order_status == OrderStatus.DELIVERED),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
+def start_disput():
+    return Seq(
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DISPUTE),
         Int(1)
     )
 
@@ -110,9 +127,11 @@ def approval_program():
     handle_claim_funds = And(can_claim_funds(), claim_funds())
     handle_complete_order = And(can_complete_order(), complete_order())
     handle_delivered = And(can_mark_as_delivered(), food_delivered())
+    handle_start_dispute = And(can_start_disput(), start_disput())
 
     action_type = Txn.application_args[AppParams.ACTION_TYPE_PARAM_INDEX]
     handle_noop = Cond(
+       [BytesEq(action_type, ActionType.START_DISPUTE), Return(handle_start_dispute)],
        [BytesEq(action_type, ActionType.COMPLETE_ORDER), Return(handle_complete_order)],
        [BytesEq(action_type, ActionType.DELIVERED), Return(handle_delivered)],
        [BytesEq(action_type, ActionType.CLAIM_FUNDS), Return(handle_claim_funds)],

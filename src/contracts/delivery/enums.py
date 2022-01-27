@@ -6,11 +6,13 @@ class ActionType:
     DELIVERED: TealType.bytes = Bytes("DELIVERED")
     CLAIM_FUNDS: TealType.bytes = Bytes("CLAIM_FUNDS")
     ASA_OPT_IN: TealType.bytes = Bytes("ASA_OPT_IN")
+    START_DISPUTE: TealType.bytes = Bytes("START_DISPUTE")
 
 class OrderStatus:
     PENDING_DELIVERY: TealType.uint64 = Int(1)
     DELIVERED: TealType.uint64 = Int(2)
-    COMPLETED: TealType.uint64 = Int(3)
+    DISPUTE: TealType.uint64 = Int(3)
+    COMPLETED: TealType.uint64 = Int(4)
 
 class AppParams:
     ASA_ID: TealType.uint64 = Int(1)
@@ -26,7 +28,7 @@ class GlobalState:
         """ Global State Schema """
         NUM_UINTS: TealType.uint64 = Int(3)
         NUM_BYTESLICES: TealType.uint64 = Int(2)
-        
+
     class Variables:
         """ Global State Variables """
         COURIER_ADDRESS: TealType.bytes = Bytes("courierAddr")
