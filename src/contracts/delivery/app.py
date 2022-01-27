@@ -55,11 +55,11 @@ def start_disput():
 def handle_creation():
     courier_address = Txn.application_args[AppParams.COURIER_ADDRESS_INDEX]
     restaurant_address = Txn.application_args[AppParams.RESTAURANT_ADDRESS_INDEX]
-    reward_amount = Btoi(Txn.application_args[AppParams.REWARD_AMOUNT_INDEX])
+    reward_amount = Btoi(Txn.application_args[AppParams.COURIER_REWARD_AMOUNT_INDEX])
     return Seq(
         App.globalPut(GlobalState.Variables.COURIER_ADDRESS, courier_address),
         App.globalPut(GlobalState.Variables.RESTAURANT_ADDRESS, restaurant_address),
-        App.globalPut(GlobalState.Variables.REWARD_AMOUNT, reward_amount),
+        App.globalPut(GlobalState.Variables.COURIER_REWARD_AMOUNT, reward_amount),
         App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.PENDING_DELIVERY),
         Int(1)
     )
@@ -72,7 +72,7 @@ def send_tip_to(address):
 
 @Subroutine(TealType.none)
 def release_funds():
-    amount = App.globalGet(GlobalState.Variables.REWARD_AMOUNT)
+    amount = App.globalGet(GlobalState.Variables.COURIER_REWARD_AMOUNT)
     courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
     restaurant_address = App.globalGet(GlobalState.Variables.RESTAURANT_ADDRESS)
     return Seq(

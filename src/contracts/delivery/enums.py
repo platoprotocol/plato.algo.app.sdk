@@ -20,7 +20,7 @@ class AppParams:
     ACTION_TYPE_PARAM_INDEX = 0
     COURIER_ADDRESS_INDEX = 0
     RESTAURANT_ADDRESS_INDEX = 1
-    REWARD_AMOUNT_INDEX = 2
+    COURIER_REWARD_AMOUNT_INDEX = 2
 
 class GlobalState:
     """ wrapper class for access to predetermined Global State properties"""
@@ -34,5 +34,5 @@ class GlobalState:
         COURIER_ADDRESS: TealType.bytes = Bytes("courierAddr")
         RESTAURANT_ADDRESS: TealType.bytes = Bytes("restaurantAddr")
         DELIVERED_TIMESTAMP: TealType.bytes = Bytes("deliveredTime")
-        REWARD_AMOUNT: TealType.bytes = Bytes("rewardAmount")
+        COURIER_REWARD_AMOUNT: TealType.bytes = Bytes("courierRewardAmount")
         ORDER_STATUS: TealType.bytes = Bytes("orderStatus")
