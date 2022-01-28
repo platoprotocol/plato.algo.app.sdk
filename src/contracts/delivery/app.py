@@ -96,7 +96,7 @@ def handle_creation():
         App.globalPut(GlobalState.Variables.COURIER_ADDRESS, courier_address),
         App.globalPut(GlobalState.Variables.RESTAURANT_ADDRESS, restaurant_address),
         App.globalPut(GlobalState.Variables.COURIER_REWARD_AMOUNT, reward_amount),
-        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DELIVERING),
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.COOKING),
         Int(1)
     )
 
