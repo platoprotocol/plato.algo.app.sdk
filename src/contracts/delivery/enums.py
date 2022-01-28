@@ -7,12 +7,14 @@ class ActionType:
     CLAIM_FUNDS: TealType.bytes = Bytes("CLAIM_FUNDS")
     ASA_OPT_IN: TealType.bytes = Bytes("ASA_OPT_IN")
     START_DISPUTE: TealType.bytes = Bytes("START_DISPUTE")
+    PICK_UP_ORDER: TealType.bytes = Bytes("PICK_UP_ORDER")
 
 class OrderStatus:
-    PENDING_DELIVERY: TealType.uint64 = Int(1)
-    DELIVERED: TealType.uint64 = Int(2)
-    DISPUTE: TealType.uint64 = Int(3)
-    COMPLETED: TealType.uint64 = Int(4)
+    COOKING: TealType.uint64 = Int(1)
+    DELIVERING: TealType.uint64 = Int(2)
+    DELIVERED: TealType.uint64 = Int(3)
+    DISPUTE: TealType.uint64 = Int(4)
+    COMPLETED: TealType.uint64 = Int(5)
 
 class AppParams:
     ASA_ID: TealType.uint64 = Int(1)

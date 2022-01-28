@@ -31,7 +31,7 @@ def can_mark_as_delivered():
     order_status = App.globalGet(GlobalState.Variables.ORDER_STATUS)
     return Seq(
         Assert(Txn.sender() == courier_address),
-        Assert(order_status == OrderStatus.PENDING_DELIVERY),
+        Assert(order_status == OrderStatus.DELIVERING),
         Int(1)
     )
 
@@ -41,6 +41,23 @@ def can_start_disput():
     return Seq(
         Assert(Txn.sender() == Global.creator_address()),
         Assert(order_status == OrderStatus.DELIVERED),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
+def can_pick_up_order():
+    courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
+    order_status = App.globalGet(GlobalState.Variables.ORDER_STATUS)
+    return Seq(
+        Assert(Txn.sender() == courier_address),
+        Assert(order_status == OrderStatus.COOKING),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
+def pick_up_order():
+    return Seq(
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DELIVERING),
         Int(1)
     )
 
@@ -60,7 +77,7 @@ def handle_creation():
         App.globalPut(GlobalState.Variables.COURIER_ADDRESS, courier_address),
         App.globalPut(GlobalState.Variables.RESTAURANT_ADDRESS, restaurant_address),
         App.globalPut(GlobalState.Variables.COURIER_REWARD_AMOUNT, reward_amount),
-        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.PENDING_DELIVERY),
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DELIVERING),
         Int(1)
     )
 
@@ -120,7 +137,7 @@ def approval_program():
     handle_optin = Return(Int(1))
     handle_closeout = Return(Int(1))
     handle_updateapp = Return(Seq(
-        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.PENDING_DELIVERY),
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DELIVERING),
         Int(1)
     ))
     handle_deleteapp = Return(Int(1))
@@ -128,9 +145,11 @@ def approval_program():
     handle_complete_order = And(can_complete_order(), complete_order())
     handle_delivered = And(can_mark_as_delivered(), food_delivered())
     handle_start_dispute = And(can_start_disput(), start_disput())
+    handle_pick_up_order = And(can_pick_up_order(), pick_up_order())
 
     action_type = Txn.application_args[AppParams.ACTION_TYPE_PARAM_INDEX]
     handle_noop = Cond(
+       [BytesEq(action_type, ActionType.PICK_UP_ORDER), Return(handle_pick_up_order)],
        [BytesEq(action_type, ActionType.START_DISPUTE), Return(handle_start_dispute)],
        [BytesEq(action_type, ActionType.COMPLETE_ORDER), Return(handle_complete_order)],
        [BytesEq(action_type, ActionType.DELIVERED), Return(handle_delivered)],
