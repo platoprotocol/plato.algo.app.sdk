@@ -7,6 +7,7 @@ class ActionType:
     CLAIM_FUNDS: TealType.bytes = Bytes("CLAIM_FUNDS")
     ASA_OPT_IN: TealType.bytes = Bytes("ASA_OPT_IN")
     START_DISPUTE: TealType.bytes = Bytes("START_DISPUTE")
+    CANCEL: TealType.bytes = Bytes("CANCEL")
     PICK_UP_ORDER: TealType.bytes = Bytes("PICK_UP_ORDER")
 
 class OrderStatus:
@@ -15,6 +16,7 @@ class OrderStatus:
     DELIVERED: TealType.uint64 = Int(3)
     DISPUTE: TealType.uint64 = Int(4)
     COMPLETED: TealType.uint64 = Int(5)
+    CANCELED: TealType.uint64 = Int(6)
 
 class AppParams:
     ASA_ID: TealType.uint64 = Int(1)

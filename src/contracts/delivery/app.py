@@ -55,6 +55,25 @@ def can_pick_up_order():
     )
 
 @Subroutine(TealType.uint64)
+def can_cancel_order():
+    courier_address = App.globalGet(GlobalState.Variables.COURIER_ADDRESS)
+    restaurant_address = App.globalGet(GlobalState.Variables.RESTAURANT_ADDRESS)
+    order_status = App.globalGet(GlobalState.Variables.ORDER_STATUS)
+    return Seq(
+        Assert(Or(Txn.sender() == courier_address, Txn.sender() == restaurant_address)),
+        Assert(order_status == OrderStatus.COOKING),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
+def cancel_order():
+    return Seq(
+        App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.CANCELED),
+        refund(),
+        Int(1)
+    )
+
+@Subroutine(TealType.uint64)
 def pick_up_order():
     return Seq(
         App.globalPut(GlobalState.Variables.ORDER_STATUS, OrderStatus.DELIVERING),
@@ -95,6 +114,16 @@ def release_funds():
     return Seq(
         send_tip_to(courier_address),
         inner_payment_txn(amount, courier_address, restaurant_address)
+    )
+
+@Subroutine(TealType.none)
+def refund():
+    # Set amount to zero because we want to sent the escrow balance to the "close-to" account.
+    amount = Int(0)
+    eater_address = Global.creator_address()
+    return Seq(
+        inner_asset_transfer_txn(AppParams.ASA_ID, amount, eater_address, eater_address),
+        inner_payment_txn(amount, eater_address, eater_address)
     )
 
 @Subroutine(TealType.uint64)
@@ -146,9 +175,11 @@ def approval_program():
     handle_delivered = And(can_mark_as_delivered(), food_delivered())
     handle_start_dispute = And(can_start_disput(), start_disput())
     handle_pick_up_order = And(can_pick_up_order(), pick_up_order())
+    handle_cancel_order = And(can_cancel_order(), cancel_order())
 
     action_type = Txn.application_args[AppParams.ACTION_TYPE_PARAM_INDEX]
     handle_noop = Cond(
+       [BytesEq(action_type, ActionType.CANCEL), Return(handle_cancel_order)],
        [BytesEq(action_type, ActionType.PICK_UP_ORDER), Return(handle_pick_up_order)],
        [BytesEq(action_type, ActionType.START_DISPUTE), Return(handle_start_dispute)],
        [BytesEq(action_type, ActionType.COMPLETE_ORDER), Return(handle_complete_order)],
