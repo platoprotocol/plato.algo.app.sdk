@@ -2,7 +2,7 @@ import algosdk from "algosdk";
 import AlgoClient from "./AlogClient";
 import AppArgument from "./types/app/arguments/AppArgument";
 
-export default class AlogAppManager {
+export default class AlgoAppManager {
   constructor(private readonly algoClient: AlgoClient) {}
 
   /**
