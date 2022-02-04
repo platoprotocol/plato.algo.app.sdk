@@ -2,6 +2,11 @@ import algosdk from "algosdk";
 import AlgoClient from "./AlogClient";
 import StringAppArgument from "./types/app/arguments/StringAppArgument";
 
+/**
+ * Minimum account balance of microAlgos on Algorand.
+ */
+export const ALGO_MIN_ACCOUNT_BALANCE = 100000;
+
 export default class AlgoMonetaryManager {
   constructor(private readonly algoClient: AlgoClient) {}
 
