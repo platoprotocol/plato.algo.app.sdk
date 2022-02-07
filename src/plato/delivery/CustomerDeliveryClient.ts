@@ -1,4 +1,4 @@
-import { ALGORAND_MIN_TX_FEE } from "algosdk";
+import { ALGORAND_MIN_TX_FEE, getApplicationAddress } from "algosdk";
 import { promises as fs } from "fs";
 import AlgoMonetaryManager, {
   ALGO_MIN_ACCOUNT_BALANCE,
@@ -8,23 +8,35 @@ import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgumen
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
 import { DeliveryActionType } from "./types";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
+import AlgoClient from "../../algo/AlogClient";
 
 const APPROVAL_PROGRAM_FILE_PATH = "./dist/escrow_approval.teal";
 const CLEAR_PROGRAM_FILE_PATH = "./dist/escrow_clear_program.teal";
 
 export default class CustomerDeliveryClient {
+  private readonly algoAppManager: AlgoAppManager;
+
   constructor(
-    private readonly algoAppManager: AlgoAppManager,
+    algoClient: AlgoClient,
     private readonly appId: number,
     private readonly customerMnemonic: string,
     private readonly merchantAddress: string,
     private readonly courierAddress: string,
     private readonly tipsAsaId: number
-  ) {}
+  ) {
+    this.algoAppManager = new AlgoAppManager(algoClient);
+  }
+
+  get applicationId(): number {
+    return this.appId;
+  }
+
+  get escrowAddress(): string {
+    return getApplicationAddress(this.appId);
+  }
 
   static async deploy(
-    algoAppManager: AlgoAppManager,
-    algoMonetaryManager: AlgoMonetaryManager,
+    algoClient: AlgoClient,
     customerMnemonic: string,
     merchantAddress: string,
     courierAddress: string,
@@ -43,6 +55,8 @@ export default class CustomerDeliveryClient {
         "orderTotalPrice should be greater than courierRewardAmount"
       );
     }
+    const algoAppManager = new AlgoAppManager(algoClient);
+    const algoMonetaryManager = new AlgoMonetaryManager(algoClient);
     const [approvalProgramSource, clearProgramSource] = await Promise.all([
       fs.readFile(APPROVAL_PROGRAM_FILE_PATH, "utf8"),
       fs.readFile(CLEAR_PROGRAM_FILE_PATH, "utf8"),
@@ -58,6 +72,7 @@ export default class CustomerDeliveryClient {
       new AddressAppArgument(merchantAddress),
       new NumberAppArgument(courierRewardAmount),
     ];
+    console.log("creating app");
     const escrow = await algoAppManager.create({
       creatorMnemonic: customerMnemonic,
       approvalProgramSource,
@@ -68,8 +83,9 @@ export default class CustomerDeliveryClient {
       globalBytes,
       appArgs,
     });
+    console.log("app created");
     const app = new CustomerDeliveryClient(
-      algoAppManager,
+      algoClient,
       escrow.id,
       customerMnemonic,
       merchantAddress,
@@ -80,12 +96,15 @@ export default class CustomerDeliveryClient {
     const transactionFees =
       numberOfInternalAppTransactions * ALGORAND_MIN_TX_FEE;
     const escrowBalance = minAccountBalance + transactionFees + orderTotalPrice;
+    console.log("transferring algos", escrowBalance);
     await algoMonetaryManager.algoTransfer(
       customerMnemonic,
       escrow.address,
       escrowBalance
     );
+    console.log("opt in asa");
     await app.optInAsa();
+    console.log("transferring asa");
     await algoMonetaryManager.assetTransfer(
       customerMnemonic,
       escrow.address,

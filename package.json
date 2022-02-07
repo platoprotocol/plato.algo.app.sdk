@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "algosdk": "^1.13.1"
+    "algosdk": "^1.13.1",
+    "ts-node": "^10.4.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.13",

@@ -1,13 +1,13 @@
-const fs = require("fs").promises;
-const algosdk = require("algosdk");
+import algosdk from "algosdk";
+import { promises as fs } from "fs";
 
-const createAlgoClient = (
+export const createAlgoClient = (
   algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   hostUrl = "http://localhost",
   hostPort = 4001
 ) => new algosdk.Algodv2(algodToken, hostUrl, hostPort);
 
-const compileProgram = async (client, programFilePath) => {
+export const compileProgram = async (client, programFilePath) => {
   const programSource = await fs.readFile(programFilePath, "utf8");
   const encoder = new TextEncoder();
   const programBytes = encoder.encode(programSource);
@@ -18,13 +18,8 @@ const compileProgram = async (client, programFilePath) => {
   return compiledBytes;
 };
 
-const decodeAddressStateValue = (value) =>
+export const decodeAddressStateValue = (value) =>
   algosdk.encodeAddress(Buffer.from(value, "base64"));
 
-const decodeStateValue = (value) =>
+export const decodeStateValue = (value) =>
   Buffer.from(value, "base64").toString("utf8");
-
-exports.compileProgram = compileProgram;
-exports.createAlgoClient = createAlgoClient;
-exports.decodeAddressStateValue = decodeAddressStateValue;
-exports.decodeStateValue = decodeStateValue;

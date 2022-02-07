@@ -1,6 +1,6 @@
-const algosdk = require("algosdk");
+import algosdk from "algosdk";
 const { createAlgoClient } = require("./utils");
-const { ASA_HOLDER_MNEMONIC } = require("./consts");
+import { ASA_HOLDER_MNEMONIC } from "./consts";
 
 (async () => {
   const client = createAlgoClient();
@@ -8,8 +8,8 @@ const { ASA_HOLDER_MNEMONIC } = require("./consts");
 
   const total = 1000000000; // how many of this asset there will be
   const decimals = 2; // units of this asset are whole-integer amounts
-  const assetName = 'plto';
-  const unitName = 'PLTO';
+  const assetName = "plto";
+  const unitName = "PLTO";
   const defaultFrozen = false; // whether accounts should be frozen by default
   const manager = account.addr;
 
@@ -25,7 +25,7 @@ const { ASA_HOLDER_MNEMONIC } = require("./consts");
     unitName,
     defaultFrozen,
     suggestedParams,
-    manager
+    manager,
   });
   const txId = txn.txID().toString();
 

@@ -167,7 +167,7 @@ export default class AlgoAppManager {
    * Make a transaction that deletes an application
    */
   async delete(args: {
-    senderMnemonic: string;
+    creatorMnemonic: string;
     appId: number;
     appArgs?: AppArgument[];
     accounts?: string[];
@@ -178,7 +178,7 @@ export default class AlgoAppManager {
     rekeyTo?: string;
   }): Promise<void> {
     await this.algoClient.sendTransaction(
-      args.senderMnemonic,
+      args.creatorMnemonic,
       (fromAddress, params) =>
         algosdk.makeApplicationDeleteTxn(
           fromAddress,

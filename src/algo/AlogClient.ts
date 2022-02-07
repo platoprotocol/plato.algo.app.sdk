@@ -20,6 +20,13 @@ export default class AlgoClient {
     this.client = new Algodv2(token, hostUrl, hostPort);
   }
 
+  async accountInformation(address: string): Promise<{ amount: number }> {
+    const compileResponse = await this.client.accountInformation(address).do();
+    return {
+      amount: compileResponse.amount,
+    };
+  }
+
   async compileProgram(programSource: string): Promise<Uint8Array> {
     const encoder = new TextEncoder();
     const programBytes = encoder.encode(programSource);
