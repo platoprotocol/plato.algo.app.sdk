@@ -1,11 +1,13 @@
 import {
   ALGORAND_MIN_TX_FEE,
   Algodv2,
+  assignGroupID,
   SuggestedParams,
   Transaction,
   waitForConfirmation,
   mnemonicToSecretKey,
 } from "algosdk";
+import { TransactionWrapperFactory } from "./types/transactions/types";
 
 const MAX_WAIT_ROUNDS = 4;
 
@@ -73,5 +75,25 @@ export default class AlgoClient {
     // More info about 'transactionResponse' the structure of can be found here:
     // https://developer.algorand.org/docs/rest-apis/algod/v2/?from_query=application-index#pendingtransactionresponse
     return appId;
+  }
+
+  async sendAtomicTransaction(
+    ...txnFactories: TransactionWrapperFactory[]
+  ): Promise<void> {
+    console.time("send atomic transaction");
+    if (!txnFactories || !txnFactories.length) {
+      return;
+    }
+    const params = await this.getDefaultParams();
+    const txnWrappers = txnFactories.map((txnFactory) =>
+      txnFactory.createTransaction(params)
+    );
+    assignGroupID(txnWrappers.map((txnWrapper) => txnWrapper.transaction));
+    const signedTransactions = txnWrappers.map((txn) => txn.signTransaction());
+    const { txId } = await this.client
+      .sendRawTransaction(signedTransactions)
+      .do();
+    await waitForConfirmation(this.client, txId, MAX_WAIT_ROUNDS);
+    console.timeEnd("send atomic transaction");
   }
 }

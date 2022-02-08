@@ -9,6 +9,7 @@ import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument"
 import { DeliveryActionType } from "./types";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
 import AlgoClient from "../../algo/AlogClient";
+import { TransactionWrapperFactory } from "../../algo/types/transactions/types";
 
 const APPROVAL_PROGRAM_FILE_PATH = "./dist/escrow_approval.teal";
 const CLEAR_PROGRAM_FILE_PATH = "./dist/escrow_clear_program.teal";
@@ -97,19 +98,24 @@ export default class CustomerDeliveryClient {
       numberOfInternalAppTransactions * ALGORAND_MIN_TX_FEE;
     const escrowBalance = minAccountBalance + transactionFees + orderTotalPrice;
     console.log("transferring algos", escrowBalance);
-    await algoMonetaryManager.algoTransfer(
+    const algoTransferTxn = algoMonetaryManager.createAlgoTransferTransaction(
       customerMnemonic,
       escrow.address,
       escrowBalance
     );
     console.log("opt in asa");
-    await app.optInAsa();
+    const optInAsaTxn = app.createOptInAsaTransaction();
     console.log("transferring asa");
-    await algoMonetaryManager.assetTransfer(
+    const asaTransferTxn = algoMonetaryManager.createAssetTransferTransaction(
       customerMnemonic,
       escrow.address,
       tips.asaId,
       tips.amount
+    );
+    await algoClient.sendAtomicTransaction(
+      algoTransferTxn,
+      optInAsaTxn,
+      asaTransferTxn
     );
     return app;
   }
@@ -143,9 +149,9 @@ export default class CustomerDeliveryClient {
     });
   }
 
-  private async optInAsa(): Promise<void> {
+  private createOptInAsaTransaction(): TransactionWrapperFactory {
     const actionType: DeliveryActionType = "ASA_OPT_IN";
-    await this.algoAppManager.invoke({
+    return this.algoAppManager.createAppInvokeTransaction({
       senderMnemonic: this.customerMnemonic,
       appId: this.appId,
       appArgs: [new StringAppArgument(actionType)],

@@ -1,6 +1,8 @@
 import algosdk from "algosdk";
 import AlgoClient from "./AlogClient";
 import StringAppArgument from "./types/app/arguments/StringAppArgument";
+import { TransactionBuilder } from "./types/transactions/TransactionBuilder";
+import { TransactionWrapperFactory } from "./types/transactions/types";
 
 /**
  * Minimum account balance of microAlgos on Algorand.
@@ -62,6 +64,52 @@ export default class AlgoMonetaryManager {
           params,
           rekeyTo
         )
+    );
+  }
+
+  createAssetTransferTransaction(
+    senderMnemonic: string,
+    receiverAddress: string,
+    assetId: number,
+    amount: number,
+    closeRemainderToAddress?: string,
+    note?: string,
+    rekeyTo?: string,
+    revocationTarget?: string
+  ): TransactionWrapperFactory {
+    return new TransactionBuilder(senderMnemonic, (fromAddress, params) =>
+      algosdk.makeAssetTransferTxnWithSuggestedParams(
+        fromAddress,
+        receiverAddress,
+        closeRemainderToAddress,
+        revocationTarget,
+        amount,
+        note ? new StringAppArgument(note).toBinary() : undefined,
+        assetId,
+        params,
+        rekeyTo
+      )
+    );
+  }
+
+  createAlgoTransferTransaction(
+    senderMnemonic: string,
+    receiverAddress: string,
+    amount: number,
+    closeRemainderToAddress?: string,
+    note?: string,
+    rekeyTo?: string
+  ): TransactionWrapperFactory {
+    return new TransactionBuilder(senderMnemonic, (fromAddress, params) =>
+      algosdk.makePaymentTxnWithSuggestedParams(
+        fromAddress,
+        receiverAddress,
+        amount,
+        closeRemainderToAddress,
+        note ? new StringAppArgument(note).toBinary() : undefined,
+        params,
+        rekeyTo
+      )
     );
   }
 }
