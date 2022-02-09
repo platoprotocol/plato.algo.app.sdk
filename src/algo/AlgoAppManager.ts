@@ -28,7 +28,6 @@ export default class AlgoAppManager {
     rekeyTo?: string;
     extraPages?: number;
   }): Promise<{ id: number; address: string }> {
-    console.time("create app");
     const senderAccount = algosdk.mnemonicToSecretKey(args.creatorMnemonic);
     const [approvalProgram, clearProgram, params] = await Promise.all([
       this.algoClient.compileProgram(args.approvalProgramSource),
@@ -56,7 +55,6 @@ export default class AlgoAppManager {
     );
     await this.algoClient.sendRawTransaction(txn, senderAccount.sk);
     const appId = await this.algoClient.getApplicationId(txn);
-    console.timeEnd("create app");
     return {
       id: appId,
       address: algosdk.getApplicationAddress(appId),

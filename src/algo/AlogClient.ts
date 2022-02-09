@@ -80,7 +80,6 @@ export default class AlgoClient {
   async sendAtomicTransaction(
     ...txnFactories: TransactionWrapperFactory[]
   ): Promise<void> {
-    console.time("send atomic transaction");
     if (!txnFactories || !txnFactories.length) {
       return;
     }
@@ -94,6 +93,5 @@ export default class AlgoClient {
       .sendRawTransaction(signedTransactions)
       .do();
     await waitForConfirmation(this.client, txId, MAX_WAIT_ROUNDS);
-    console.timeEnd("send atomic transaction");
   }
 }

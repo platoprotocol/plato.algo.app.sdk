@@ -73,7 +73,6 @@ export default class CustomerDeliveryClient {
       new AddressAppArgument(merchantAddress),
       new NumberAppArgument(courierRewardAmount),
     ];
-    console.log("creating app");
     const escrow = await algoAppManager.create({
       creatorMnemonic: customerMnemonic,
       approvalProgramSource,
@@ -84,7 +83,6 @@ export default class CustomerDeliveryClient {
       globalBytes,
       appArgs,
     });
-    console.log("app created");
     const app = new CustomerDeliveryClient(
       algoClient,
       escrow.id,
@@ -97,15 +95,12 @@ export default class CustomerDeliveryClient {
     const transactionFees =
       numberOfInternalAppTransactions * ALGORAND_MIN_TX_FEE;
     const escrowBalance = minAccountBalance + transactionFees + orderTotalPrice;
-    console.log("transferring algos", escrowBalance);
     const algoTransferTxn = algoMonetaryManager.createAlgoTransferTransaction(
       customerMnemonic,
       escrow.address,
       escrowBalance
     );
-    console.log("opt in asa");
     const optInAsaTxn = app.createOptInAsaTransaction();
-    console.log("transferring asa");
     const asaTransferTxn = algoMonetaryManager.createAssetTransferTransaction(
       customerMnemonic,
       escrow.address,
