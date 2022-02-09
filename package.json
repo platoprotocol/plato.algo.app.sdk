@@ -1,6 +1,6 @@
 {
   "name": "@alexey_chernenko_plato/demo-algo-sdk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "dependencies": {
     "algosdk": "^1.13.1"
