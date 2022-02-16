@@ -10,6 +10,7 @@ import { DeliveryActionType } from "./types";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
 import AlgoClient from "../../algo/AlogClient";
 import { TransactionWrapperFactory } from "../../algo/types/transactions/types";
+import { StateSchema } from "../../algo/types/app/types";
 
 const APPROVAL_PROGRAM_FILE_PATH = "./dist/escrow_approval.teal";
 const CLEAR_PROGRAM_FILE_PATH = "./dist/escrow_clear_program.teal";
@@ -62,10 +63,8 @@ export default class CustomerDeliveryClient {
       fs.readFile(APPROVAL_PROGRAM_FILE_PATH, "utf8"),
       fs.readFile(CLEAR_PROGRAM_FILE_PATH, "utf8"),
     ]);
-    const localInts = 0;
-    const localBytes = 0;
-    const globalInts = 3;
-    const globalBytes = 2;
+    const localState: StateSchema = { ints: 0, bytes: 0 };
+    const globalState: StateSchema = { ints: 3, bytes: 2 };
     const numberOfInternalAppTransactions = 3;
     const numberOfHoldingAssets = 2; // Algo Coin + Plato token
     const appArgs = [
@@ -77,10 +76,8 @@ export default class CustomerDeliveryClient {
       creatorMnemonic: customerMnemonic,
       approvalProgramSource,
       clearProgramSource,
-      localInts,
-      localBytes,
-      globalInts,
-      globalBytes,
+      localState,
+      globalState,
       appArgs,
     });
     const app = new CustomerDeliveryClient(

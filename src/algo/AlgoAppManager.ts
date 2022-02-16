@@ -1,6 +1,7 @@
 import algosdk from "algosdk";
 import AlgoClient from "./AlogClient";
 import AppArgument from "./types/app/arguments/AppArgument";
+import { StateSchema } from "./types/app/types";
 import { TransactionBuilder } from "./types/transactions/TransactionBuilder";
 import { TransactionWrapperFactory } from "./types/transactions/types";
 
@@ -15,10 +16,8 @@ export default class AlgoAppManager {
     creatorMnemonic: string;
     approvalProgramSource: string;
     clearProgramSource: string;
-    localInts: number;
-    localBytes: number;
-    globalInts: number;
-    globalBytes: number;
+    localState: StateSchema;
+    globalState: StateSchema;
     appArgs?: AppArgument[];
     accounts?: string[];
     foreignApps?: number[];
@@ -40,10 +39,10 @@ export default class AlgoAppManager {
       algosdk.OnApplicationComplete.NoOpOC,
       approvalProgram,
       clearProgram,
-      args.localInts,
-      args.localBytes,
-      args.globalInts,
-      args.globalBytes,
+      args.localState.ints,
+      args.localState.bytes,
+      args.globalState.ints,
+      args.globalState.bytes,
       args.appArgs?.map((appArg) => appArg.toBinary()),
       args.accounts,
       args.foreignApps,
