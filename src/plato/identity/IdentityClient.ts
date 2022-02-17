@@ -6,6 +6,7 @@ import AlgoClient from "../../algo/AlogClient";
 import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgument";
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
+import { StateSchema } from "../../algo/types/app/types";
 import { unixNow } from "../../utils/date";
 import {
   IdentityActionType,
@@ -34,20 +35,16 @@ export default class IdentityClient {
       fs.readFile(APPROVAL_PROGRAM_FILE_PATH, "utf8"),
       fs.readFile(CLEAR_PROGRAM_FILE_PATH, "utf8"),
     ]);
-    const localInts = 8;
-    const localBytes = 8;
-    const globalInts = 1;
-    const globalBytes = 1;
+    const localState: StateSchema = { ints: 8, bytes: 8 };
+    const globalState: StateSchema = { ints: 1, bytes: 1 };
     const startTime = IdentityClient.getStartTime();
     const appArgs = [new NumberAppArgument(startTime)];
     const { id } = await algoAppManager.create({
       creatorMnemonic,
       approvalProgramSource,
       clearProgramSource,
-      localInts,
-      localBytes,
-      globalInts,
-      globalBytes,
+      localState,
+      globalState,
       appArgs,
     });
 
