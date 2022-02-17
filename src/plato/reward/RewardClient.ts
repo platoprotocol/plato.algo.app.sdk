@@ -4,29 +4,27 @@ import {
   mnemonicToSecretKey,
 } from "algosdk";
 import { promises as fs } from "fs";
-import AlgoMonetaryManager, {
-  ALGO_MIN_ACCOUNT_BALANCE,
-} from "../../algo/AlgoMonetaryManager";
+import AlgoMonetaryManager from "../../algo/AlgoMonetaryManager";
 import AlgoAppManager from "../../algo/AlgoAppManager";
 import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgument";
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
 import AlgoClient from "../../algo/AlogClient";
+import { ALGO_MIN_ACCOUNT_BALANCE } from "../../algo/constants";
 import { TransactionWrapperFactory } from "../../algo/types/transactions/types";
 import { StateSchema } from "../../algo/types/app/types";
 import { getFutureTime } from "../../utils/date";
 import { RewardActionType, RewardType } from "./types";
 
-const APPROVAL_PROGRAM_FILE_PATH = "./dist/rewards_approval.teal";
-const CLEAR_PROGRAM_FILE_PATH = "./dist/rewards_clear_state.teal";
+const APPROVAL_PROGRAM_FILE_PATH = "../../../dist/rewards_approval.teal";
+const CLEAR_PROGRAM_FILE_PATH = "../../../dist/rewards_clear_state.teal";
 
 export default class RewardClient {
-  private readonly algoClient: AlgoClient;
   private readonly algoAppManager: AlgoAppManager;
   private readonly algoMonetaryManager: AlgoMonetaryManager;
 
   constructor(
-    algoClient: AlgoClient,
+    private readonly algoClient: AlgoClient,
     private readonly appId: number,
     private readonly platoAsaId: number
   ) {
@@ -49,7 +47,7 @@ export default class RewardClient {
     platoAsaId: number,
     initialPlatoAsaAmount: number,
     initialAlgoAmount: number
-  ): Promise<RewardClient> {
+  ): Promise<{ id: number }> {
     const algoAppManager = new AlgoAppManager(algoClient);
     const [approvalProgramSource, clearProgramSource] = await Promise.all([
       fs.readFile(APPROVAL_PROGRAM_FILE_PATH, "utf8"),
@@ -81,7 +79,7 @@ export default class RewardClient {
       initialPlatoAsaAmount,
       initialAlgoAmount
     );
-    return app;
+    return { id: appInfo.id };
   }
 
   private async fundApp(
@@ -104,7 +102,7 @@ export default class RewardClient {
     if (initialPlatoAsaAmount < 0) {
       throw new Error(`initialAsaAmount is required`);
     }
-    const userAddress = mnemonicToSecretKey(userMnemonic).addr;
+    const { addr: userAddress } = mnemonicToSecretKey(userMnemonic);
     const accountInfo = await this.algoClient.accountInformation(userAddress);
     if (accountInfo.amount < minAlgoBalance) {
       throw new Error(

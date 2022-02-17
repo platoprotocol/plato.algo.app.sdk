@@ -1,8 +1,8 @@
 import { mnemonicToSecretKey } from "algosdk";
-import { ALGORAND_ZERO_ADDRESS_STRING } from "algosdk/dist/types/src/encoding/address";
 import { promises as fs } from "fs";
 import AlgoAppManager from "../../algo/AlgoAppManager";
 import AlgoClient from "../../algo/AlogClient";
+import { ALGORAND_ZERO_ADDRESS_STRING } from "../../algo/constants";
 import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgument";
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
@@ -16,8 +16,8 @@ import {
   USER_TYPE_BUYER,
 } from "./types";
 
-const APPROVAL_PROGRAM_FILE_PATH = "./dist/identity_approval.teal";
-const CLEAR_PROGRAM_FILE_PATH = "./dist/identity_clear_program.teal";
+const APPROVAL_PROGRAM_FILE_PATH = "../../../dist/identity_approval.teal";
+const CLEAR_PROGRAM_FILE_PATH = "../../../dist/identity_clear_program.teal";
 
 export default class IdentityClient {
   private readonly algoAppManager: AlgoAppManager;

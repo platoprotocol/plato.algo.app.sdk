@@ -1,8 +1,6 @@
 import { ALGORAND_MIN_TX_FEE, getApplicationAddress } from "algosdk";
 import { promises as fs } from "fs";
-import AlgoMonetaryManager, {
-  ALGO_MIN_ACCOUNT_BALANCE,
-} from "../../algo/AlgoMonetaryManager";
+import AlgoMonetaryManager from "../../algo/AlgoMonetaryManager";
 import AlgoAppManager from "../../algo/AlgoAppManager";
 import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgument";
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
@@ -11,6 +9,7 @@ import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument"
 import AlgoClient from "../../algo/AlogClient";
 import { TransactionWrapperFactory } from "../../algo/types/transactions/types";
 import { StateSchema } from "../../algo/types/app/types";
+import { ALGO_MIN_ACCOUNT_BALANCE } from "../../algo/constants";
 
 const APPROVAL_PROGRAM_FILE_PATH = "./dist/escrow_approval.teal";
 const CLEAR_PROGRAM_FILE_PATH = "./dist/escrow_clear_program.teal";

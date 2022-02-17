@@ -66,6 +66,17 @@ export default class AlgoClient {
     await waitForConfirmation(this.client, txId, MAX_WAIT_ROUNDS);
   }
 
+  async getAssetId(transaction: Transaction): Promise<number> {
+    const txId = transaction.txID().toString();
+    const transactionResponse = await this.client
+      .pendingTransactionInformation(txId)
+      .do();
+    const id = transactionResponse["asset-index"];
+    // More info about 'transactionResponse' the structure of can be found here:
+    // https://developer.algorand.org/docs/rest-apis/algod/v2/?from_query=application-index#pendingtransactionresponse
+    return id;
+  }
+
   async getApplicationId(transaction: Transaction): Promise<number> {
     const txId = transaction.txID().toString();
     const transactionResponse = await this.client
