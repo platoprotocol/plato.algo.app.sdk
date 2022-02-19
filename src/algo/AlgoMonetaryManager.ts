@@ -146,4 +146,25 @@ export default class AlgoMonetaryManager {
       )
     );
   }
+
+  createAssetOptInTransaction(
+    senderMnemonic: string,
+    assetId: number
+  ): TransactionWrapperFactory {
+    const senderAccount = algosdk.mnemonicToSecretKey(senderMnemonic);
+    const amount = 0;
+    return new TransactionBuilder(senderMnemonic, (fromAddress, params) =>
+      algosdk.makeAssetTransferTxnWithSuggestedParams(
+        fromAddress,
+        senderAccount.addr,
+        undefined,
+        undefined,
+        amount,
+        undefined,
+        assetId,
+        params,
+        undefined
+      )
+    );
+  }
 }

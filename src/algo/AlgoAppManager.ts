@@ -222,4 +222,31 @@ export default class AlgoAppManager {
       )
     );
   }
+
+  createOptInTransaction(args: {
+    senderMnemonic: string;
+    appId: number;
+    appArgs?: AppArgument[];
+    accounts?: string[];
+    foreignApps?: number[];
+    foreignAssets?: number[];
+    note?: AppArgument;
+    lease?: AppArgument;
+    rekeyTo?: string;
+  }): TransactionWrapperFactory {
+    return new TransactionBuilder(args.senderMnemonic, (fromAddress, params) =>
+      algosdk.makeApplicationOptInTxn(
+        fromAddress,
+        params,
+        args.appId,
+        args.appArgs?.map((appArg) => appArg.toBinary()),
+        args.accounts,
+        args.foreignApps,
+        args.foreignAssets,
+        args.note?.toBinary(),
+        args.lease?.toBinary(),
+        args.rekeyTo
+      )
+    );
+  }
 }

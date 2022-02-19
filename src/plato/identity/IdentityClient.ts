@@ -7,6 +7,7 @@ import AddressAppArgument from "../../algo/types/app/arguments/AddressAppArgumen
 import NumberAppArgument from "../../algo/types/app/arguments/NumberAppArgument";
 import StringAppArgument from "../../algo/types/app/arguments/StringAppArgument";
 import { StateSchema } from "../../algo/types/app/types";
+import { TransactionWrapperFactory } from "../../algo/types/transactions/types";
 import { getFutureTime } from "../../utils/date";
 import {
   IdentityActionType,
@@ -21,6 +22,8 @@ const CLEAR_PROGRAM_FILE_PATH = "../../../dist/identity_clear_program.teal";
 
 export default class IdentityClient {
   private readonly algoAppManager: AlgoAppManager;
+
+  static readonly OPT_IN_COST = 728000;
 
   constructor(algoClient: AlgoClient, readonly appId: number) {
     this.algoAppManager = new AlgoAppManager(algoClient);
@@ -49,6 +52,31 @@ export default class IdentityClient {
     });
 
     return { id };
+  }
+
+  createOptInTransaction(args: {
+    userMnemonic: string;
+    userType: UserType;
+    latitude?: string;
+    longitude?: string;
+    refererAddress?: string;
+  }): TransactionWrapperFactory {
+    const startTime = getFutureTime();
+    const { addr: userAddress } = mnemonicToSecretKey(args.userMnemonic);
+    return this.algoAppManager.createOptInTransaction({
+      senderMnemonic: args.userMnemonic,
+      appId: this.appId,
+      appArgs: [
+        new AddressAppArgument(userAddress),
+        new NumberAppArgument(args.userType),
+        new NumberAppArgument(startTime),
+        new StringAppArgument(args.latitude || ""),
+        new StringAppArgument(args.longitude || ""),
+        new AddressAppArgument(
+          args.refererAddress || ALGORAND_ZERO_ADDRESS_STRING
+        ),
+      ],
+    });
   }
 
   async optIn(
@@ -84,6 +112,7 @@ export default class IdentityClient {
     await this.algoAppManager.invoke({
       senderMnemonic: merchantMnemonic,
       appId: this.appId,
+      accounts: [courierAddress],
       appArgs: [
         new StringAppArgument(actionType),
         new NumberAppArgument(userType),
@@ -103,6 +132,7 @@ export default class IdentityClient {
     await this.algoAppManager.invoke({
       senderMnemonic: buyerMnemonic,
       appId: this.appId,
+      accounts: [merchantAddress],
       appArgs: [
         new StringAppArgument(actionType),
         new NumberAppArgument(userType),
